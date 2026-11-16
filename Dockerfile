@@ -13,7 +13,7 @@ RUN npm ci --include=dev
 
 COPY . .
 RUN npm run typecheck \
-  && chmod +x tools/luau/luau tools/luau-compile
+    && chmod +x tools/luau/luau tools/luau/luau-compile
 
 ENV NODE_ENV=production
 ENV PORT=3000
