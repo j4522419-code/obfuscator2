@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grandfuscator 2.1 — Roblox Luau Obfuscator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Studio Header -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 28 28" fill="none">
+            <path d="M14 2.2L24.2 6.8V14.1C24.2 20.1 19.8 24.4 14 26.2C8.2 24.4 3.8 20.1 3.8 14.1V6.8L14 2.2Z" stroke="currentColor" stroke-width="1.75" fill="rgba(245,158,11,0.1)"/>
+            <path d="M17.2 10.4H11.6C10.5 10.4 9.6 11.3 9.6 12.4V15.8C9.6 16.9 10.5 17.8 11.6 17.8H16.4C17.5 17.8 18.4 16.9 18.4 15.8V14.2H14.2" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">Grandfuscator</span>
+          <span class="brand-badge">STABLE 2.1</span>
+          <span class="brand-sub-badge" title="100% real custom Virtual Machine — zero loadstring or string.char wrappers">0 LOADSTRING</span>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="sample-picker">
+          <label for="sampleSelect" class="sr-only">Load example</label>
+          <select id="sampleSelect" class="control-select compact" title="Load a sample Roblox Luau script">
+            <option value="">Examples…</option>
+            <option value="combat">Combat Controller (--@novm 60 FPS)</option>
+            <option value="module">Licensed ModuleScript (OOP)</option>
+            <option value="placelock">PlaceId-Locked Loader</option>
+            <option value="closures">Closures, Upvalues &amp; Coroutines</option>
+          </select>
+        </div>
+        <div class="sample-picker">
+          <label for="runtimeSelect" class="sr-only">Runtime backend</label>
+          <select id="runtimeSelect" class="control-select compact" title="Choose the compatibility or v3 flat-vmem runtime">
+            <option value="compat">Compat · stable default</option>
+            <option value="v3-experimental">v3 · flat-vmem (no ID locks)</option>
+          </select>
+        </div>
+
+        <button type="button" id="uploadBtn" class="btn btn-ghost" title="Open a .luau or .lua file">
+          <svg viewBox="0 0 16 16" fill="none" class="icon"><path d="M8 10.5V2.5M8 2.5L4.8 5.7M8 2.5L11.2 5.7M2.5 11.5V12.5C2.5 13.05 2.95 13.5 3.5 13.5H12.5C13.05 13.5 13.5 13.05 13.5 12.5V11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Import File</span>
+        </button>
+        <input type="file" id="fileInput" accept=".lua,.luau,.txt" hidden />
+
+        <button type="button" id="obfuscateBtn" class="btn btn-primary">
+          <svg viewBox="0 0 16 16" fill="none" class="icon btn-icon-lock"><path d="M4.75 7V5.25C4.75 3.455 6.205 2 8 2C9.795 2 11.25 3.455 11.25 5.25V7M3.75 7H12.25C12.802 7 13.25 7.448 13.25 8V12.75C13.25 13.302 12.802 13.75 12.25 13.75H3.75C3.198 13.75 2.75 13.302 2.75 12.75V8C2.75 7.448 3.198 7 3.75 7Z" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="obfuscateLabel">Obfuscate</span>
+          <kbd class="kbd-hint">Ctrl+↵</kbd>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main 3-Column Studio Workspace -->
+    <main class="workspace">
+      <!-- Left Rail: Pure VM Architecture & Armor Controls -->
+      <aside class="sidebar">
+        <div class="sidebar-scroll">
+          <!-- 100% Pure Virtual Machine Tiers -->
+          <section class="config-section">
+            <div class="section-label">
+              <span>Runtime Preset</span>
+              <span class="section-sub">Compat default · v3 selectable</span>
+            </div>
+            <div class="preset-stack" role="radiogroup" aria-label="VM obfuscation preset">
+              <button type="button" class="preset-card" data-preset="swift" role="radio" aria-checked="false">
+                <div class="preset-head">
+                  <span class="preset-title">Swift VM</span>
+                  <span class="preset-tag fps">60 FPS</span>
+                </div>
+                <p class="preset-desc">Compatibility CCFI VM with lower startup overhead and anti-tamper sensors.</p>
+              </button>
+
+              <button type="button" class="preset-card active" data-preset="fortress" role="radio" aria-checked="true">
+                <div class="preset-head">
+                  <span class="preset-title">Fortress VM</span>
+                  <span class="preset-tag rec">Recommended</span>
+                </div>
+                <p class="preset-desc">Balanced compatibility VM, duplicated handlers, live buffer mutation &amp; Micro-VM.</p>
+              </button>
+
+              <button type="button" class="preset-card" data-preset="nightmare" role="radio" aria-checked="false">
+                <div class="preset-head">
+                  <span class="preset-title">Nightmare VM</span>
+                  <span class="preset-tag max">Anti-Devirt</span>
+                </div>
+                <p class="preset-desc">Higher handler duplication and anti-tamper coverage, with more runtime overhead.</p>
+              </button>
+            </div>
+          </section>
+
+          <!-- Compatibility VM & Anti-Tamper Switches -->
+          <section class="config-section">
+            <div class="section-label">
+              <span>VM Armor &amp; Compiler</span>
+              <span class="section-sub">Compatibility Runtime</span>
+            </div>
+
+            <label class="toggle-row">
+              <span class="toggle-copy">
+                <span class="toggle-title">Live Bytecode Mutation</span>
+                <span class="toggle-sub" id="bytecodeMutationSub">Re-encrypts raw 12B buffer per instruction</span>
+              </span>
+              <input type="checkbox" id="bytecodeMutationCheck" checked />
+            </label>
+
+            <label class="toggle-row">
+              <span class="toggle-copy">
+                  <span class="toggle-title">Opcode Mutation &amp; Swaps</span>
+                  <span class="toggle-sub" id="opcodeMutationSub">Available in v3 flat runtime</span>
+              </span>
+              <input type="checkbox" id="opcodeMutationCheck" disabled />
+            </label>
+
+            <label class="toggle-row">
+              <span class="toggle-copy">
+                  <span class="toggle-title">Multi-Hub Graph CFF</span>
+                  <span class="toggle-sub" id="graphCffSub">Available in v3 flat runtime</span>
+              </span>
+              <input type="checkbox" id="graphCffCheck" disabled />
+            </label>
+
+            <label class="toggle-row">
+              <span class="toggle-copy">
+                  <span class="toggle-title">Anti-Tamper &amp; Env Tripwire</span>
+                  <span class="toggle-sub" id="antiTamperSub">Compatibility-only heuristic checks; client inspection is not preventable</span>
+              </span>
+              <input type="checkbox" id="antiTamperCheck" checked />
+            </label>
+
+            <div class="field-grid" style="margin-top: 8px;">
+              <div class="field">
+                <label for="jumpChainSelect">Jump Chains (v3)</label>
+                <select id="jumpChainSelect" class="control-select" disabled>
+                  <option value="0" selected>Unavailable in 2.1</option>
+                  <option value="1">1-Hop Chain</option>
+                  <option value="2">2-Hop Chain</option>
+                  <option value="3">3-Hop Chain</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="opcodeDupSelect">Opcode Split</label>
+                <select id="opcodeDupSelect" class="control-select">
+                  <option value="1">1x ISA</option>
+                  <option value="2" selected>2x Split</option>
+                  <option value="3">3x Poly</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <!-- Roblox PlaceId / GameId Key Lock -->
+          <section class="config-section">
+            <div class="section-label">
+              <span>Roblox Game Lock</span>
+              <span class="section-sub">Optional</span>
+            </div>
+            <div class="field">
+              <label for="placeIdsInput">Allowed PlaceIds</label>
+              <input type="text" id="placeIdsInput" class="control-input mono" placeholder="e.g. 1818, 17625359962" spellcheck="false" />
+            </div>
+            <div class="field">
+              <label for="gameIdsInput">Allowed GameIds (Universe)</label>
+              <input type="text" id="gameIdsInput" class="control-input mono" placeholder="e.g. 9944112233" spellcheck="false" />
+            </div>
+            <p class="field-hint">53-bit IDs unwrap inside the Micro-VM key schedule — never stored in plaintext.</p>
+          </section>
+
+          <!-- Collapsible Deep Compiler Tuning -->
+          <section class="config-section">
+            <button type="button" id="advancedToggle" class="accordion-trigger" aria-expanded="false">
+              <span>Deep Compiler Tuning</span>
+              <svg viewBox="0 0 16 16" fill="none" class="chevron"><path d="M4.5 6.25L8 9.75L11.5 6.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+
+            <div id="advancedPanel" class="accordion-body" hidden>
+              <label class="toggle-row">
+                <span class="toggle-copy">
+                  <span class="toggle-title">Nested Micro-VM Keygen</span>
+                  <span class="toggle-sub" id="microVmSub">Compatibility-only key generation</span>
+                </span>
+                <input type="checkbox" id="microVmCheck" checked />
+              </label>
+
+              <label class="toggle-row">
+                <span class="toggle-copy">
+                    <span class="toggle-title">Fused Superinstructions</span>
+                    <span class="toggle-sub" id="superinstSub">Available in v3 flat runtime</span>
+                  </span>
+                  <input type="checkbox" id="superinstCheck" disabled />
+              </label>
+
+              <div class="field">
+                <label for="stringModeSelect">Encrypted String Vault</label>
+                <select id="stringModeSelect" class="control-select">
+                  <option value="lazy">Lazy Autokey (FPS-friendly)</option>
+                  <option value="ephemeral">Ephemeral (Zero RAM cache)</option>
+                </select>
+              </div>
+
+              <div class="field-grid">
+                <div class="field">
+                  <label for="nameStyleSelect">Identifiers</label>
+                  <select id="nameStyleSelect" class="control-select">
+                    <option value="barcode" selected>Barcode (lI1_)</option>
+                    <option value="short">Compact (a, x9)</option>
+                    <option value="shadow">Shadow (O0oQ)</option>
+                    <option value="hex">Hex (_0x9f3A)</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="mbaDepthSelect">MBA Depth</label>
+                  <select id="mbaDepthSelect" class="control-select">
+                    <option value="0">Off</option>
+                    <option value="1">Level 1</option>
+                    <option value="2" selected>Level 2</option>
+                    <option value="3">Level 3</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="slider-head">
+                  <label for="decoyRange">Decoy Opcode Handlers</label>
+                  <span id="decoyValue" class="mono-val">20</span>
+                </div>
+                <input type="range" id="decoyRange" min="0" max="44" value="20" />
+              </div>
+
+              <div class="field">
+                <label for="watermarkInput">Header Watermark</label>
+                <input type="text" id="watermarkInput" class="control-input" value="Protected by Grandfuscator" maxlength="100" placeholder="Leave blank for pure 1-line output" />
+              </div>
+            </div>
+          </section>
+
+          <!-- FPS Pragma Tip -->
+          <section class="pragma-note">
+            <div class="pragma-title">60-FPS Hot-Loop Pragma</div>
+            <p>Everything compiles into the VM by default. Add <code>--@novm</code> above a per-frame <code>RenderStepped</code> callback to keep that math at native 0.08ms speed with live shared upvalues.</p>
+          </section>
+        </div>
+      </aside>
+
+      <!-- Center Pane: Source Luau Editor -->
+      <section class="editor-pane" id="inputPane">
+        <div class="pane-header">
+          <div class="pane-title-group">
+            <span class="pane-dot source"></span>
+            <input type="text" id="filenameInput" class="filename-input mono" value="script.luau" spellcheck="false" title="Edit script filename" />
+            <span id="inputMeta" class="pane-meta mono">0 lines · 0 B</span>
+          </div>
+          <div class="pane-actions">
+            <button type="button" id="clearBtn" class="btn-mini" title="Clear input editor">Clear</button>
+          </div>
+        </div>
+
+        <div id="errorBanner" class="error-banner" hidden>
+          <svg viewBox="0 0 16 16" fill="none" class="icon"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5V8.5M8 11H8.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <span id="errorText"></span>
+        </div>
+
+        <div class="code-container">
+          <div id="lineNumbers" class="line-numbers mono" aria-hidden="true">1</div>
+          <textarea
+            id="sourceEditor"
+            class="code-editor mono"
+            spellcheck="false"
+            autocapitalize="off"
+            autocomplete="off"
+            autocorrect="off"
+            placeholder="-- Paste your Roblox Luau Script, LocalScript, or ModuleScript here (or drop a .luau file)…"
+          ></textarea>
+          <div id="dropOverlay" class="drop-overlay" hidden>
+            <div class="drop-box">Drop <code>.luau</code> or <code>.lua</code> file to load</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Pane: Obfuscated VM Output & Telemetry -->
+      <section class="editor-pane output-pane">
+        <div class="pane-header">
+          <div class="pane-title-group">
+            <span class="pane-dot output" id="outputDot"></span>
+            <span class="pane-title">Virtual Machine Output</span>
+            <span id="buildBadge" class="status-pill neutral" hidden></span>
+            <span id="verifyBadge" class="status-pill ok" hidden>Luau 0.747 Verified</span>
+          </div>
+          <div class="pane-actions">
+            <button type="button" id="wrapToggleBtn" class="btn-mini active" title="Visual line wrap only — copied/downloaded VM stays on a single intact line">Wrap</button>
+            <button type="button" id="testRunBtn" class="btn-mini" disabled title="Execute in Official Roblox Luau 0.747 & run 5 live red-team anti-tamper attacks">Verify &amp; Red-Team</button>
+            <button type="button" id="copyBtn" class="btn btn-action" disabled>
+              <svg viewBox="0 0 16 16" fill="none" class="icon"><rect x="5.25" y="5.25" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.45"/><path d="M10.75 5.25V3.75C10.75 3.198 10.302 2.75 9.75 2.75H3.75C3.198 2.75 2.75 3.198 2.75 3.75V9.75C2.75 10.302 3.198 10.75 3.75 10.75H5.25" stroke="currentColor" stroke-width="1.45"/></svg>
+              <span id="copyLabel">Copy</span>
+            </button>
+            <button type="button" id="downloadBtn" class="btn btn-action" disabled>
+              <svg viewBox="0 0 16 16" fill="none" class="icon"><path d="M8 2.5V10.5M8 10.5L4.8 7.3M8 10.5L11.2 7.3M2.5 11.5V12.5C2.5 13.05 2.95 13.5 3.5 13.5H12.5C13.05 13.5 13.5 13.05 13.5 12.5V11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Download</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="output-body">
+          <!-- Empty state before first build -->
+          <div id="emptyState" class="empty-state">
+            <div class="empty-icon">
+              <svg viewBox="0 0 32 32" fill="none">
+                <path d="M16 3L27.5 8.2V16.2C27.5 22.9 22.5 27.9 16 29.8C9.5 27.9 4.5 22.9 4.5 16.2V8.2L16 3Z" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M11.5 16.2L14.6 19.3L20.8 13.1" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3>Ready to synthesize a one-of-a-kind Dual-VM</h3>
+            <p>Compiles your Roblox Luau through a 7-pass CFG optimizer/flattener into live self-mutating 12-byte encrypted bytecode with rolling CCFI opcodes, multi-hop jump chains, nested Micro-VM keygen, and 8-layer silent anti-tamper — with zero <code>loadstring</code>.</p>
+          </div>
+
+          <textarea
+            id="outputEditor"
+            class="code-editor output-editor mono wrapped"
+            readonly
+            spellcheck="false"
+            hidden
+          ></textarea>
+        </div>
+
+        <!-- Sandbox & Red-Team Penetration Drawer -->
+        <div id="sandboxDrawer" class="sandbox-drawer" hidden>
+          <div class="sandbox-head">
+            <span class="sandbox-title">Luau 0.747 &amp; Red-Team Suite</span>
+            <div class="sandbox-badges" id="sandboxBadges"></div>
+            <button type="button" id="closeSandboxBtn" class="btn-mini">Close</button>
+          </div>
+          <div id="attackGrid" class="attack-grid" hidden></div>
+          <pre id="sandboxOutput" class="sandbox-log mono"></pre>
+        </div>
+
+        <!-- Build Telemetry Footer -->
+        <footer id="statsBar" class="stats-bar" hidden>
+          <div class="stats-metrics">
+            <div class="metric">
+              <span class="metric-k">Output</span>
+              <span class="metric-v mono" id="statSize">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-k">VM ISA</span>
+              <span class="metric-v mono" id="statOpcodes">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-k">Graph CFF</span>
+              <span class="metric-v mono" id="statCff">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-k">Chains / Muts</span>
+              <span class="metric-v mono" id="statChains">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-k">Micro-VM / AT</span>
+              <span class="metric-v mono" id="statArmor">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-k">Slot Layout</span>
+              <span class="metric-v mono" id="statLayout">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-k">Compile</span>
+              <span class="metric-v mono" id="statTime">—</span>
+            </div>
+          </div>
+          <div id="layerPills" class="layer-pills"></div>
+        </footer>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script src="/app.js" type="module"></script>
+</body>
+</html>

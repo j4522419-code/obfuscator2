@@ -1,0 +1,22 @@
+{
+  "name": "grandfuscator",
+  "version": "2.1.0",
+  "description": "Polymorphic Virtual Machine & AST Obfuscator for Roblox Luau",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "start": "tsx src/server.ts",
+    "cli": "tsx src/cli.ts",
+    "test": "tsx tests/run-tests.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^20.17.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
