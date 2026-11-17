@@ -1,0 +1,8 @@
+Windows test support for Grandfuscator
+
+Contains the official Luau Windows command-line tools luau.exe and luau-compile.exe from Luau release 0.744.
+Upstream release: https://github.com/luau-lang/luau/releases/tag/0.744
+Upstream luau-windows.zip SHA-256: fde3e22c557aac6afe20a34e8050b7d8c290fa42638c04274a307ed5d0ef0db8
+
+Also contains src/engine/verifier.ts updated to select .exe files on Windows while keeping Unix binary paths on Unix.
+This archive overlays only the listed files; it does not contain Git metadata, dependencies, or a full source tree.

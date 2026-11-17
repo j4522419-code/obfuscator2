@@ -838,7 +838,7 @@ console.log('\n--- Zero-loadstring & Zero-Leakage Audit ---');
   assert.notEqual(b1.code, b2.code);
   const r1 = executeLuau(b1.code);
   const r2 = executeLuau(b2.code);
-  if (r1.ok && r2.ok && r1.stdout === 'sum\t45\n' && r2.stdout === 'sum\t45\n') {
+  if (r1.ok && r2.ok && r1.stdout.replace(/\r\n/g, '\n') === 'sum\t45\n' && r2.stdout.replace(/\r\n/g, '\n') === 'sum\t45\n') {
     pass(
       `Per-build Dual-VM polymorphism (${b1.stats.buildId} [${b1.stats.wordPermutation}/${b1.stats.headerPermutation}] vs ${b2.stats.buildId} [${b2.stats.wordPermutation}/${b2.stats.headerPermutation}])`,
     );

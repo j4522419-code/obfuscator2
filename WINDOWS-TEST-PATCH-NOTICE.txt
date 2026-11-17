@@ -1,0 +1,4 @@
+Version-matched Windows test fix
+
+Extract this ZIP into C:\Users\user\obfuscator2, replacing tests/run-tests.ts.
+It restores the test suite matching the repository checkout and changes only the polymorphism test comparison to normalize CRLF output on Windows. It does not change application/runtime code and does not include Luau binaries.
